@@ -24,6 +24,7 @@ public class TripServiceTest {
 	@Before
 	public void setUp() {
 		tripService = new TestableTripService();
+		loggedInUser = DAVE;
 
 	}
 
@@ -36,7 +37,6 @@ public class TripServiceTest {
 
 	@Test
 	public void should_not_return_trips_when_users_arent_friends() throws Exception {
-		loggedInUser = DAVE;
 		FRED.addFriend(MARTIN);
 		FRED.addTrip(USA);
 		
@@ -44,12 +44,27 @@ public class TripServiceTest {
 		
 		assertEquals(0, friendsTrips.size());
 	}
+	
+	@Test 
+	public void should_return_trips_when_users_are_friend() throws Exception{
+		FRED.addFriend(DAVE);
+		FRED.addTrip(USA);
+		
+		List<Trip> friendsTrips = tripService.getTripsByUser(FRED);
+
+		assertEquals(1, friendsTrips.size());
+	}
 
 	private class TestableTripService extends TripService {
 
 		@Override
 		protected User getLoggedInUser() {
 			return loggedInUser;
+		}
+
+		@Override
+		protected List<Trip> tripsBy(User user) {
+			return user.trips();
 		}
 
 	}
