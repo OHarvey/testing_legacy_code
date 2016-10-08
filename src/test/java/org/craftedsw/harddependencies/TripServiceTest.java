@@ -11,21 +11,19 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class TripServiceTest {
-
+	
+	private User loggedInUser;
 	private User NOT_LOGGED_IN = null;
 	private User DAVE = new User();
 	private User FRED = new User();
-	private User MARTIN = new User();
-	private User loggedInUser;
 	private Trip USA = new Trip();
-
-	TripService tripService;
+	
+	private TripService tripService;
 
 	@Before
 	public void setUp() {
 		tripService = new TestableTripService();
 		loggedInUser = DAVE;
-
 	}
 
 	@Test(expected = UserNotLoggedInException.class)
@@ -37,24 +35,23 @@ public class TripServiceTest {
 
 	@Test
 	public void should_not_return_trips_when_users_arent_friends() throws Exception {
-		FRED.addFriend(MARTIN);
-		FRED.addTrip(USA);
-		
-		List<Trip> friendsTrips = tripService.getTripsByUser(FRED);
+		User friend = UserBuilder.aUser().isFriendsWith(FRED).withTripsTo(USA).build();
+
+		List<Trip> friendsTrips = tripService.getTripsByUser(friend);
 		
 		assertEquals(0, friendsTrips.size());
 	}
 	
 	@Test 
 	public void should_return_trips_when_users_are_friend() throws Exception{
-		FRED.addFriend(DAVE);
-		FRED.addTrip(USA);
 		
-		List<Trip> friendsTrips = tripService.getTripsByUser(FRED);
+		User friend = UserBuilder.aUser().isFriendsWith(FRED, DAVE).withTripsTo(USA).build();
+		
+		List<Trip> friendsTrips = tripService.getTripsByUser(friend);
 
 		assertEquals(1, friendsTrips.size());
 	}
-
+	
 	private class TestableTripService extends TripService {
 
 		@Override
