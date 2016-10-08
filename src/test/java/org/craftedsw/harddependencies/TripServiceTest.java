@@ -7,6 +7,7 @@ import org.craftedsw.harddependencies.trip.Trip;
 import org.craftedsw.harddependencies.user.User;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static org.junit.Assert.*;
 
@@ -30,14 +31,14 @@ public class TripServiceTest {
 	public void should_throw_UserNotLoggedInException() throws UserNotLoggedInException {
 		loggedInUser = NOT_LOGGED_IN;
 
-		tripService.getTripsByUser(NOT_LOGGED_IN);
+		tripService.getTripsBy(NOT_LOGGED_IN, loggedInUser);
 	}
 
 	@Test
 	public void should_not_return_trips_when_users_arent_friends() throws Exception {
 		User friend = UserBuilder.aUser().isFriendsWith(FRED).withTripsTo(USA).build();
 
-		List<Trip> friendsTrips = tripService.getTripsByUser(friend);
+		List<Trip> friendsTrips = tripService.getTripsBy(friend, loggedInUser);
 		
 		assertEquals(0, friendsTrips.size());
 	}
@@ -47,17 +48,12 @@ public class TripServiceTest {
 		
 		User friend = UserBuilder.aUser().isFriendsWith(FRED, DAVE).withTripsTo(USA).build();
 		
-		List<Trip> friendsTrips = tripService.getTripsByUser(friend);
+		List<Trip> friendsTrips = tripService.getTripsBy(friend, loggedInUser);
 
 		assertEquals(1, friendsTrips.size());
 	}
 	
 	private class TestableTripService extends TripService {
-
-		@Override
-		protected User getLoggedInUser() {
-			return loggedInUser;
-		}
 
 		@Override
 		protected List<Trip> tripsBy(User user) {

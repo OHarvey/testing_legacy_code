@@ -11,26 +11,23 @@ import org.craftedsw.harddependencies.user.UserSession;
 
 public class TripService {
 
-	public List<Trip> getTripsByUser(User user) throws UserNotLoggedInException {
-		User loggedInUser = validateLoggedInUser();
-		return user.isFriendsWith(loggedInUser) ? tripsBy(user) : new ArrayList<Trip>();
+	public List<Trip> getTripsBy(User friend, User loggedInUser) throws UserNotLoggedInException {
+		validate(loggedInUser);
+		return friend.isFriendsWith(loggedInUser) ? tripsBy(friend) : noTrips();
 	}
 
-	private User validateLoggedInUser() throws UserNotLoggedInException {
-		User loggedUser = getLoggedInUser();
-		if (loggedUser == null) {
-			throw new UserNotLoggedInException();
+	private ArrayList<Trip> noTrips() {
+		return new ArrayList<Trip>();
+	}
 
+	private User validate(User loggedInUser) throws UserNotLoggedInException {
+		if (loggedInUser == null) {
+			throw new UserNotLoggedInException();
 		}
-		return loggedUser;
+		return loggedInUser;
 	}
 
 	protected List<Trip> tripsBy(User user) {
 		return TripDAO.findTripsByUser(user);
 	}
-
-	protected User getLoggedInUser() {
-		return UserSession.getInstance().getLoggedUser();
-	}
-
 }
